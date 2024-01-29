@@ -1,0 +1,24 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+.Menu{
+    width: 20%;
+    background-color: black;
+    color: azure;
+}
+.menu-inner{
+    height: 100vh;
+    overflow: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.menu-inner::-webkit-scrollbar {
+    display: none;
+}
+.menu-inner ul{
+    list-style: none;
+}
+.menu-inner li{
+    margin-left: 10px;
+}
