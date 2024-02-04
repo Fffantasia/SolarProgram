@@ -1,24 +1,34 @@
-*{
-    margin: 0;
-    padding: 0;
-}
 .Menu{
-    width: 20%;
+    width: 0;
+    border-left: 1px solid white;
     background-color: black;
-    color: azure;
+    color: white;
+    transition: 0.5s;
+    position: absolute;
+    right: 0;
 }
 .menu-inner{
     height: 100vh;
     overflow: scroll;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    margin-left: 10px;
 }
 .menu-inner::-webkit-scrollbar {
     display: none;
 }
-.menu-inner ul{
+.planets-title, .asteroid-title{
+    user-select: none;
+}
+.Menu ul{
     list-style: none;
 }
-.menu-inner li{
+.Menu li{
     margin-left: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+.sun-title{
+    cursor: pointer;
+    user-select: none;
 }

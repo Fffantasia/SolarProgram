@@ -1,4 +1,39 @@
+*{
+    margin: 0;
+    padding: 0;
+}
 .Data{
     display: flex;
-    flex: 2;
+}
+.arrow{
+    border: 2px solid white;
+    border-radius: 10px 0 0 10px;
+	height: 60px;
+	width: 30px;
+    text-align: center;
+    position: absolute;
+    top: 20px;
+    right: 0%;
+    z-index: 99;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.5s;
+}
+.arrow-left{
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+}
+.arrow-right{
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
 }

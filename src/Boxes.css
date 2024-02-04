@@ -3,9 +3,8 @@ body {
   margin: 0;
   overflow: hidden;
 }
-
 .Boxes {
-  width: 100vw;
+  flex: 70%;
   height: 100vh;
   background-color: black;
 }

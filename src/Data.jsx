@@ -14,6 +14,7 @@ function Data(){
     const [planets, setPlanets] = useState([]);
     const [asteroids, setAsteroids] = useState([]);
     const [bodyToGo, setBodyToGo] = useState(null);
+    const [opened, setOpened] = useState(false);
 
     useEffect(() => {
         const fetchData = async() =>{
@@ -72,15 +73,38 @@ function Data(){
     if(isLoading) {
         return <></>;
     }
-    console.log(complexBodies);
+    /*console.log(complexBodies);
     console.log(moons)
     console.log(simpleBodies);
     console.log(planets);
-    console.log(asteroids);
+    console.log(asteroids);*/
+
+    function keyDownHandler(e){
+        console.log("hola")
+    }
+        window.addEventListener('keydown', function(event) {
+            if(event.repeat){event.preventDefault()}
+            console.log("Flecha ocultar")
+            if(event.key == "j"){
+                if(opened){
+                    setOpened(!opened)
+                    setTimeout(() => {
+                        if(document.getElementById("arrow").style.display == "none"){
+                            document.getElementById("arrow").style.display = "flex"
+                        }else document.getElementById("arrow").style.display = "none"
+                    }, 450);
+                }else{
+                    if(document.getElementById("arrow").style.display == "none"){
+                        document.getElementById("arrow").style.display = "flex"
+                    }else document.getElementById("arrow").style.display = "none"
+                } 
+            }
+        });//onKeyDown={(e) => console.log(e)}
     return(
         <div className='Data'>
             <SolarSystem simpleBodies={simpleBodies} moons={moons} complexBodies={complexBodies} setBodyToGo={setBodyToGo} bodyToGo={bodyToGo}/>
-            <Menu planets={planets} asteroids={asteroids} moons={moons} setBodyToGo={setBodyToGo}/>
+            <div id="arrow" className="arrow" onClick={() => setOpened(!opened)} style={opened == true ? {"right": "15%"} : {"right": "0"}}>{opened == true ? <i className="arrow-right"></i> : <i className="arrow-left"></i>}</div>
+            <Menu planets={planets} asteroids={asteroids} moons={moons} setBodyToGo={setBodyToGo} opened={opened}/>
         </div>
     )
 }

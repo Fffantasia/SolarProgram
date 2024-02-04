@@ -4,12 +4,10 @@ import { CameraControls, useHelper, Stars, Loader } from '@react-three/drei'
 import "./Boxes.css";
 import { PointLightHelper } from 'three';
 import * as THREE from 'three';
-
-function Box({position, size, color, name}) {
-    // This reference gives us direct access to the THREE.Mesh object
+//Fisicas de la camara para limitar min distance en la camara y solucionar el bug que no deja acercarse
+function Box({position, size, color, name, setBodyToGo}) {
     const ref = useRef()
     const [hovered, hover] = useState()
-    //const [clicked, click] = useState(false)
 
     useFrame((state, delta) => {
       ref.current.rotation.x += delta * 0.2
@@ -20,8 +18,7 @@ function Box({position, size, color, name}) {
       <mesh
         position={name == 'Sun' ? [0, 0, 0] : position}
         ref={ref}
-        //scale={clicked ? 1 : 1}
-        onClick={(event) => bodyClicked(name, position.x)}
+        onClick={() => bodyClicked(name, setBodyToGo)}
         onPointerOver={(event) => (event.stopPropagation(), hover(true))}
         onPointerOut={(event) => hover(false)}
         name={name}>
@@ -31,35 +28,42 @@ function Box({position, size, color, name}) {
     )
 }
 
-function bodyClicked(name, x){
+function bodyClicked(name, setBodyToGo){
   console.log(name)
-  //cameraConfig = {position:[x, 0, 1200000], far: 0x10000000}; Al clicar cambiar la camara justo al frente del objeto
+  setBodyToGo(name)
 }
 
 function Scene ({simpleBodies, moons, complexBodies, bodyToGo, setBodyToGo}) {
   const pointLightRef = useRef()
-  const cameraControlsRef = useRef()
-  const [cameraCoords, setCameraCoords] = useState(false)
+  const cameraControlsRef = useRef(null)
+  const [cameraCoords, setCameraCoords] = useState(null)
   const [frameNeeded, setFrameNeeded] = useState(false)
 
   useHelper(pointLightRef, PointLightHelper, 0.5, 'black')
 
-  useFrame((state, delta) => {
-    if(frameNeeded && bodyToGo){
+  useFrame(state => {
+    if(frameNeeded){
       setCameraCoords(state.scene.getObjectByName(bodyToGo).position)
-      //state.camera.lookAt(cameraCoords); Apuntar al objeto (posiblemente sea igual a lo que hara el bodyClicked)
-      //state.camera.position.lerp(cameraCoords, .01); Moverse al objeto
+      //Tiene isGroup y el primer hijo es siempre el planeta ------ boundingBox? con computeboundingbox no funciona
+      console.log(state.scene.getObjectByName(bodyToGo)) //1.7
       setFrameNeeded(false)
       setBodyToGo(null)
     }
   })
-  useEffect(()=>{ //La primera vez siempre devuelve coordenadas false
+  useEffect(()=>{ //La primera vez siempre devuelve coordenadas false (se debe ejecutar con el inicio)
     if(bodyToGo){
       console.log(bodyToGo)
       setFrameNeeded(true)
-      console.log(cameraCoords)
     }
   }, [bodyToGo])
+  useEffect(()=>{
+    if(cameraCoords){
+      var cameraToBody = (bodyToGo = "Sun") ? 1200000 : 700000 //cameraCoords.z  + state.scene.getObjectByName(bodyToGo).meanRadius * 1.7
+      cameraControlsRef.current?.setLookAt(cameraCoords.x, cameraCoords.y, cameraToBody, cameraCoords.x, cameraCoords.y, cameraCoords.z, true);
+      console.log(cameraCoords)
+      //console.log(state.scene.getObjectByName(bodyToGo)) //1.7
+    }
+  }, [cameraCoords])
   
   return(
     <>
@@ -67,7 +71,7 @@ function Scene ({simpleBodies, moons, complexBodies, bodyToGo, setBodyToGo}) {
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
       <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} ref={pointLightRef} />
       {simpleBodies.map((body)=>(
-        <Box key={body.englishName} name={body.englishName} position={[body.semimajorAxis/10, 0, 0]} size={[body.meanRadius, 100, 100]} color={'white'} />
+        <Box key={body.englishName} name={body.englishName} position={[body.semimajorAxis/10, 0, 0]} size={[body.meanRadius, 100, 100]} color={'white'} setBodyToGo={setBodyToGo} />
       ))}
       {complexBodies.map(body =>{
         var planetMoons = [];
@@ -79,10 +83,10 @@ function Scene ({simpleBodies, moons, complexBodies, bodyToGo, setBodyToGo}) {
           })
         });
         return(<group key={body.englishName + "Group"} name={body.englishName} position={[body.semimajorAxis/10, 0, 0]}>
-          <Box key={body.englishName} name={body.englishName} position={[0, 0, 0]} size={[body.meanRadius, 100, 100]} color={'white'} />
+          <Box key={body.englishName} name={body.englishName} position={[0, 0, 0]} size={[body.meanRadius, 100, 100]} color={'white'} setBodyToGo={setBodyToGo} />
           <>
           {planetMoons.map((moon)=>(
-            <Box key={moon.englishName} name={moon.englishName} position={[moon.semimajorAxis/10 + body.meanRadius, 0, 0]} size={[moon.meanRadius, 100, 100]} color={'white'} />
+            <Box key={moon.englishName} name={moon.englishName} position={[moon.semimajorAxis/10 + body.meanRadius, 0, 0]} size={[moon.meanRadius, 100, 100]} color={'white'} setBodyToGo={setBodyToGo} />
           ))}
           </>
         </group>)
@@ -96,7 +100,6 @@ function Scene ({simpleBodies, moons, complexBodies, bodyToGo, setBodyToGo}) {
 export default function Boxes({simpleBodies, moons, complexBodies, setBodyToGo, bodyToGo}) {
   return (
       <div className='Boxes'>
-        <p>aaaa</p>
           <Canvas camera={{position:[0, 0, 1200000], far: 0x10000000}}>
               <Scene simpleBodies={simpleBodies} moons={moons} complexBodies={complexBodies} bodyToGo={bodyToGo} setBodyToGo={setBodyToGo}/>
           </Canvas>
